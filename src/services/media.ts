@@ -4,7 +4,6 @@ import { CheckFileExists } from "./helpers/fileExists.js";
 
 //------------------------------------------------Internal------------------------------------------------
 let mediaFolderPath = "";
-let advertMediaPath = "";
 
 let mediaPlayer = document.getElementById("media-player") as
   | HTMLVideoElement
@@ -20,6 +19,7 @@ let mediaFilesIndex: string[] = [];
 
 //------------------------------------------------Configuration------------------------------------------------
 let randomSkipMediaTimer = 0;
+let advertMediaPath = "";
 let playAdvert = false;
 
 export async function Start() {
