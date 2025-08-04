@@ -1,0 +1,163 @@
+import fs from "fs/promises";
+import path from "path";
+import { CheckFileExists } from "./helpers/fileExists.js";
+
+//------------------------------------------------Internal------------------------------------------------
+let mediaFolderPath = "";
+let advertMediaPath = "";
+
+let mediaPlayer = document.getElementById("media-player") as
+  | HTMLVideoElement
+  | HTMLImageElement
+  | HTMLDivElement;
+
+let playTV = false;
+
+const videoExtensions: string[] = [".mp4", ".mkv", ".avi", ".mov"];
+const imageExtensions: string[] = [".jpg", ".jpeg", ".png", ".gif"];
+
+let mediaFilesIndex: string[] = [];
+
+//------------------------------------------------Configuration------------------------------------------------
+let randomSkipMediaTimer = 0;
+let playAdvert = false;
+
+export async function Start() {
+  InitializeMediaPlayer();
+
+  if (!mediaFolderPath) {
+    console.error("Media folder path is not set.");
+    return;
+  }
+
+  mediaFilesIndex = await IndexMediaFolder();
+
+  if (mediaFilesIndex.length === 0) {
+    console.error("No media files found in the specified folder.");
+    return;
+  }
+
+  let timer = 0;
+
+  if (randomSkipMediaTimer > 0) {
+    timer = randomSkipMediaTimer;
+  }
+
+  while (playTV) {
+    let mediaIndex = Math.floor(Math.random() * mediaFilesIndex.length); // .floor rounds to an integer
+    PlayMediaRandomly(mediaIndex, timer);
+
+    if (mediaPlayer instanceof HTMLVideoElement) {
+      mediaPlayer.addEventListener("ended", () => {
+        setTimeout(() => {}, randomSkipMediaTimer);
+      });
+    } else {
+      // For images
+      if (randomSkipMediaTimer == 0) {
+        setTimeout(() => {}, 5000);
+      } else {
+        setTimeout(() => {}, randomSkipMediaTimer);
+      }
+    }
+  }
+
+  if (playAdvert) {
+    PlayAdvert();
+  }
+}
+
+async function PlayMediaRandomly(mediaIndex: number, timer: number) {
+  let mediaElement: HTMLVideoElement | HTMLImageElement;
+
+  if (!mediaPlayer) {
+    console.error("Media player element not found.");
+    return;
+  }
+
+  let mediaFilePath = mediaFilesIndex[mediaIndex];
+
+  if (mediaFilePath === undefined) {
+    console.error("Media File Path is null", mediaIndex);
+    return;
+  }
+
+  let checkFileExists = await CheckFileExists(mediaFilePath);
+
+  if (!checkFileExists) {
+    console.error("Media file does not exist:", mediaFilePath);
+    return;
+  }
+
+  const fileExtension = mediaFilePath
+    .substring(mediaFilePath.lastIndexOf("."))
+    .toLowerCase();
+
+  if (videoExtensions.includes(fileExtension)) {
+    // Create a video element for videos
+    const video = document.createElement("video");
+    video.src = mediaFilePath;
+    video.controls = true;
+    video.autoplay = true;
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.objectFit = "cover";
+    mediaElement = video;
+  } else if (imageExtensions.includes(fileExtension)) {
+    // Create image element for photos
+    const img = document.createElement("img");
+    img.src = mediaFilePath;
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    mediaElement = img;
+  } else {
+    console.error("Unsupported media type:", fileExtension);
+    return;
+  }
+
+  mediaPlayer = mediaElement;
+}
+
+async function IndexMediaFolder() {
+  try {
+    const files = await fs.readdir(mediaFolderPath);
+    const mediaFiles: string[] = [];
+
+    for (const file of files) {
+      const filePath = path.join(mediaFolderPath, file);
+      const fileInfo = await fs.stat(filePath);
+      if (
+        fileInfo.isFile() &&
+        videoExtensions
+          .concat(imageExtensions)
+          .includes(path.extname(file).toLowerCase())
+      ) {
+        mediaFiles.push(filePath);
+      }
+    }
+
+    return mediaFiles;
+  } catch (error) {
+    console.error("Error reading media files:", error);
+    return [];
+  }
+}
+
+function PickMediaFolderPath(path: string) {
+  mediaFolderPath = path;
+}
+
+function PickAdvertMedaPath(path: string) {
+  advertMediaPath = path;
+}
+
+function InitializeMediaPlayer() {
+  if (!mediaPlayer) {
+    console.error("Media player element not found.");
+    return;
+  }
+
+  mediaPlayer.innerHTML = "";
+}
+
+function PlayAdvert() {}
