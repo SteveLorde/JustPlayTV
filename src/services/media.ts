@@ -3,6 +3,10 @@ import path from "path";
 import { CheckFileExists } from "./helpers/fileExists.js";
 
 //------------------------------------------------Internal------------------------------------------------
+document.addEventListener("contextmenu", function (e) {
+  e.preventDefault();
+});
+
 let mediaFolderPath = "";
 
 let mediaPlayer = document.getElementById("media-player") as
@@ -23,10 +27,24 @@ let advertMediaPath = "";
 let playAdvert = false;
 
 export async function Start() {
-  InitializeMediaPlayer();
+  // InitializeMediaPlayer();
 
   if (!mediaFolderPath) {
     console.error("Media folder path is not set.");
+    return;
+  }
+
+  let timer = 0;
+
+  if (randomSkipMediaTimer > 0) {
+    timer = randomSkipMediaTimer;
+  }
+
+  await PlayMediaRandomly(timer);
+}
+
+async function PlayMediaRandomly(timer: number) {
+  if (!playTV) {
     return;
   }
 
@@ -37,36 +55,8 @@ export async function Start() {
     return;
   }
 
-  let timer = 0;
+  const mediaIndex = Math.floor(Math.random() * mediaFilesIndex.length); // .floor to round integer
 
-  if (randomSkipMediaTimer > 0) {
-    timer = randomSkipMediaTimer;
-  }
-
-  while (playTV) {
-    let mediaIndex = Math.floor(Math.random() * mediaFilesIndex.length); // .floor rounds to an integer
-    PlayMediaRandomly(mediaIndex, timer);
-
-    if (mediaPlayer instanceof HTMLVideoElement) {
-      mediaPlayer.addEventListener("ended", () => {
-        setTimeout(() => {}, randomSkipMediaTimer);
-      });
-    } else {
-      // For images
-      if (randomSkipMediaTimer == 0) {
-        setTimeout(() => {}, 5000);
-      } else {
-        setTimeout(() => {}, randomSkipMediaTimer);
-      }
-    }
-  }
-
-  if (playAdvert) {
-    PlayAdvert();
-  }
-}
-
-async function PlayMediaRandomly(mediaIndex: number, timer: number) {
   let mediaElement: HTMLVideoElement | HTMLImageElement;
 
   if (!mediaPlayer) {
@@ -116,6 +106,15 @@ async function PlayMediaRandomly(mediaIndex: number, timer: number) {
   }
 
   mediaPlayer = mediaElement;
+
+  if (mediaPlayer instanceof HTMLVideoElement) {
+    mediaPlayer.addEventListener("ended", function () {
+      PlayMediaRandomly(timer);
+    });
+  } else {
+    // for images
+    setTimeout(() => PlayMediaRandomly, 5000);
+  }
 }
 
 async function IndexMediaFolder() {
@@ -151,6 +150,7 @@ function PickAdvertMedaPath(path: string) {
   advertMediaPath = path;
 }
 
+/*
 function InitializeMediaPlayer() {
   if (!mediaPlayer) {
     console.error("Media player element not found.");
@@ -159,5 +159,11 @@ function InitializeMediaPlayer() {
 
   mediaPlayer.innerHTML = "";
 }
+ */
 
-function PlayAdvert() {}
+function PlayAdvert() {
+  if (advertMediaPath === null || advertMediaPath === "") {
+    console.error("Advert media path is not set.");
+    return;
+  }
+}
