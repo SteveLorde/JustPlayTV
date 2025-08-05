@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { CheckFileExists } from "./helpers/fileExists.js";
+import { clearTimeout } from "node:timers";
 
 //------------------------------------------------Internal------------------------------------------------
 document.addEventListener("contextmenu", function (e) {
@@ -15,6 +16,8 @@ let mediaPlayer = document.getElementById("media-player") as
   | HTMLDivElement;
 
 let playTV = false;
+let paused = false;
+let mediaPlayerImageTimer: NodeJS.Timeout;
 
 const videoExtensions: string[] = [".mp4", ".mkv", ".avi", ".mov"];
 const imageExtensions: string[] = [".jpg", ".jpeg", ".png", ".gif"];
@@ -28,6 +31,8 @@ let playAdvert = false;
 
 export async function Start() {
   // InitializeMediaPlayer();
+
+  playTV = true;
 
   if (!mediaFolderPath) {
     console.error("Media folder path is not set.");
@@ -113,7 +118,25 @@ async function PlayMediaRandomly(timer: number) {
     });
   } else {
     // for images
-    setTimeout(() => PlayMediaRandomly, 5000);
+    mediaPlayerImageTimer = setTimeout(() => PlayMediaRandomly(timer), 5000);
+  }
+}
+
+async function TogglePause() {
+  paused = !paused;
+
+  if (mediaPlayer instanceof HTMLVideoElement) {
+    if (paused) {
+      mediaPlayer.pause();
+    } else {
+      mediaPlayer.play();
+    }
+  } else {
+    if (paused) {
+      clearTimeout(mediaPlayerImageTimer);
+    } else {
+      mediaPlayerImageTimer = setTimeout(() => PlayMediaRandomly(0), 5000);
+    }
   }
 }
 
@@ -144,6 +167,8 @@ async function IndexMediaFolder() {
 
 function PickMediaFolderPath(path: string) {
   mediaFolderPath = path;
+
+  setTimeout(() => Start(), 1000);
 }
 
 function PickAdvertMedaPath(path: string) {
