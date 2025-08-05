@@ -86,7 +86,7 @@ async function PlayMediaRandomly(timer: number) {
     // Create a video element for videos
     const video = document.createElement("video");
     video.src = mediaFilePath;
-    video.controls = true;
+    video.controls = false;
     video.autoplay = true;
     video.style.width = "100%";
     video.style.height = "100%";
