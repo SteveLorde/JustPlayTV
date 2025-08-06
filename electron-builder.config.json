@@ -1,14 +1,17 @@
 {
-  "build": {
-    "appId": "com.example.electron-boilerplate",
-    "files": [
-      "app/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "resources"
-    },
-    "publish": null
+  "appId": "com.example.justplaytv",
+  "files": [
+    "build/**/*",
+    "package.json"
+  ],
+  "directories": {
+    "output": "dist",
+    "buildResources": "build"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "linux": {
+    "target": "AppImage"
   }
 }

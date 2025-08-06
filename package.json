@@ -5,12 +5,12 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "src/main.ts",
+  "main": "build/main.js",
   "scripts": {
     "start": "electron .",
     "build": "tsc && copyfiles -u 1 src/*.html build",
     "packagetest": "electron-builder --config=electron-builder.config.json --dir=./release",
-    "package": "electron-builder --config=electron-builder.config.json"
+    "package": "npm run build && electron-builder --config=electron-builder.config.json"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
