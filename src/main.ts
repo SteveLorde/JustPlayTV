@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import { Start } from "./services/media.js";
 
-const createWindow = () => {
+function CreateWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
@@ -11,10 +11,10 @@ const createWindow = () => {
   });
 
   win.loadFile("main.html");
-};
+}
 
 app.whenReady().then(() => {
-  createWindow();
+  CreateWindow();
   Start();
 });
 

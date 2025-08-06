@@ -15,8 +15,8 @@ let mediaPlayer = document.getElementById("media-player") as
   | HTMLImageElement
   | HTMLDivElement;
 
-let playTV = false;
-let paused = false;
+let playTV: boolean = false;
+let paused: boolean = false;
 let mediaPlayerImageTimer: NodeJS.Timeout;
 
 const videoExtensions: string[] = [".mp4", ".mkv", ".avi", ".mov"];
@@ -114,27 +114,34 @@ async function PlayMediaRandomly(timer: number) {
 
   if (mediaPlayer instanceof HTMLVideoElement) {
     mediaPlayer.addEventListener("ended", function () {
+      PlayAdvert();
       PlayMediaRandomly(timer);
     });
   } else {
     // for images
-    mediaPlayerImageTimer = setTimeout(() => PlayMediaRandomly(timer), 5000);
+    mediaPlayerImageTimer = setTimeout(() => {
+      PlayAdvert();
+      PlayMediaRandomly(timer);
+    }, 5000);
   }
 }
 
 async function TogglePause() {
+  playTV = !playTV;
   paused = !paused;
 
   if (mediaPlayer instanceof HTMLVideoElement) {
     if (paused) {
       mediaPlayer.pause();
     } else {
+      playTV = true;
       mediaPlayer.play();
     }
   } else {
     if (paused) {
       clearTimeout(mediaPlayerImageTimer);
     } else {
+      playTV = true;
       mediaPlayerImageTimer = setTimeout(() => PlayMediaRandomly(0), 5000);
     }
   }
@@ -186,9 +193,18 @@ function InitializeMediaPlayer() {
 }
  */
 
-function PlayAdvert() {
+async function PlayAdvert() {
   if (advertMediaPath === null || advertMediaPath === "") {
     console.error("Advert media path is not set.");
     return;
   }
+
+  const video = document.createElement("video");
+  video.src = advertMediaPath;
+  video.controls = false;
+  video.autoplay = true;
+  video.style.width = "100%";
+  video.style.height = "100%";
+  video.style.objectFit = "cover";
+  mediaPlayer = video;
 }
