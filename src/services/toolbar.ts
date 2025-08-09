@@ -3,6 +3,14 @@ const toolbarContainer = document.getElementById(
 ) as HTMLElement;
 const toolbar = document.getElementById("toolbar") as HTMLElement;
 
+const settingsButton = document.getElementById(
+  "settings-button",
+) as HTMLElement;
+const pauseButton = document.getElementById("pause-button") as HTMLElement;
+const fullscreenButton = document.getElementById(
+  "fullscreen-button",
+) as HTMLElement;
+
 let showToolbar = false;
 
 toolbarContainer.addEventListener("pointerenter", function () {

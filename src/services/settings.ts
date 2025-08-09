@@ -12,13 +12,25 @@ export function SetSkipMediaTimer(timer: number) {
   SetTimer(timer * 60 * 1000);
 }
 
-export function ToggleSettings() {
+function ToggleSettings() {
   settingsVisible = !settingsVisible;
 
   if (settingsVisible) {
     settingsModal.classList.add("settings-open");
   } else {
     settingsModal.classList.remove("settings-close");
-    settingsModal.remove();
   }
 }
+
+export function OpenSettings() {}
+
+function CloseSettings() {
+  settingsVisible = false;
+  settingsModal.classList.remove("settings-close");
+}
+
+document.addEventListener("click", function () {
+  if (settingsVisible) {
+    CloseSettings();
+  }
+});
