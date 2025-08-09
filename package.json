@@ -9,7 +9,6 @@
   "scripts": {
     "start": "electron .",
     "build": "tsc && copyfiles -u 1 src/*.html build",
-    "packagetest": "electron-builder --config=electron-builder.config.json --dir=./release",
     "package": "npm run build && electron-builder --config=electron-builder.config.json"
   },
   "devDependencies": {

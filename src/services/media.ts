@@ -4,10 +4,6 @@ import { CheckFileExists } from "./helpers/fileExists.js";
 import { clearTimeout } from "node:timers";
 
 //------------------------------------------------Internal------------------------------------------------
-document.addEventListener("contextmenu", function (e) {
-  e.preventDefault();
-});
-
 let mediaFolderPath = "";
 
 let mediaPlayer = document.getElementById("media-player") as
@@ -191,7 +187,11 @@ function InitializeMediaPlayer() {
 
   mediaPlayer.innerHTML = "";
 }
- */
+*/
+
+export function SetTimer(timer: number) {
+  randomSkipMediaTimer = timer;
+}
 
 async function PlayAdvert() {
   if (advertMediaPath === null || advertMediaPath === "") {
@@ -208,3 +208,10 @@ async function PlayAdvert() {
   video.style.objectFit = "cover";
   mediaPlayer = video;
 }
+
+//------------------------------------------------Events/Subscriptions------------------------------------------------
+window.addEventListener("resize", function () {
+  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
